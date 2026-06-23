@@ -1,0 +1,45 @@
+{
+  "name": "aiction-browser",
+  "displayName": "AIction",
+  "version": "0.3.0",
+  "description": "A lightweight Chrome extension for getting AI help on selected web content.",
+  "license": "GPL-3.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "bundle-icons": "npx tsx scripts/bundle-icons.ts",
+    "build": "npm run bundle-icons && wxt build",
+    "build:firefox": "npm run bundle-icons && wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.81",
+    "@ai-sdk/deepseek": "^2.0.35",
+    "@ai-sdk/google": "^3.0.80",
+    "@ai-sdk/openai": "^3.0.67",
+    "@ai-sdk/openai-compatible": "^2.0.48",
+    "@iconify/react": "^6.0.2",
+    "@openrouter/ai-sdk-provider": "^2.9.0",
+    "ai": "^6.0.193",
+    "marked": "^18.0.4",
+    "pdfjs-dist": "^5.7.284",
+    "posthog-js": "^1.376.3",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "use-debounce": "^10.1.1"
+  },
+  "devDependencies": {
+    "@iconify/json": "^2.2.481",
+    "@types/chrome": "^0.1.42",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@wxt-dev/auto-icons": "^1.1.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "wxt": "^0.20.26"
+  }
+}
