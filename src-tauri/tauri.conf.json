@@ -1,0 +1,79 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "AIction",
+  "version": "0.1.0",
+  "identifier": "com.aiction.desktop",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "AIction Desktop",
+        "width": 1000,
+        "height": 700,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    },
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "android": {
+      "debugApplicationIdSuffix": ".debug"
+    }
+  },
+  "plugins": {
+    "store": {
+      "defaults": {
+        "settings": {
+          "providers": [],
+          "activeProviderId": "",
+          "theme": "auto",
+          "language": "system",
+          "actions": [],
+          "quickActions": [],
+          "telemetryEnabled": false
+        }
+      }
+    },
+    "shell": {
+      "open": true,
+      "scope": [
+        {
+          "name": "ollama",
+          "cmd": "ollama",
+          "args": true
+        }
+      ]
+    },
+    "fs": {
+      "scope": {
+        "allow": ["**"],
+        "deny": []
+      }
+    },
+    "global-shortcut": {
+      "shortcuts": ["CommandOrControl+Shift+A"]
+    }
+  }
+}
