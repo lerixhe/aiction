@@ -1,19 +1,25 @@
 use tauri::Manager;
 
 mod commands;
+mod error;
+mod state;
+
+pub use error::AppError;
+pub use state::{AppState, AiConfig};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
+    .manage(AppState::new())
     .plugin(tauri_plugin_store::Builder::default().build())
     .plugin(tauri_plugin_shell::init())
     .plugin(tauri_plugin_fs::init())
     .plugin(tauri_plugin_clipboard_manager::init())
     .plugin(tauri_plugin_global_shortcut::Builder::default().build())
     .plugin(tauri_plugin_notification::init())
+    .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_log::Builder::default().level(log::LevelFilter::Info).build())
     .setup(|app| {
-      // 获取应用数据目录
       let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
       std::fs::create_dir_all(&app_data_dir).expect("failed to create app data dir");
       
@@ -24,9 +30,10 @@ pub fn run() {
     })
     .invoke_handler(tauri::generate_handler![
       // 基础命令
-      greet,
-      get_app_version,
-      get_app_data_dir,
+      commands::basic::greet,
+      commands::basic::get_app_version,
+      commands::basic::get_app_data_dir,
+      commands::basic::get_current_time,
       
       // AI 命令
       commands::ai::test_api_connection,
@@ -60,20 +67,4 @@ pub fn run() {
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
-}
-
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! Welcome to AIction.", name)
-}
-
-#[tauri::command]
-fn get_app_version() -> String {
-    env!("CARGO_PKG_VERSION").to_string()
-}
-
-#[tauri::command]
-fn get_app_data_dir(app: tauri::AppHandle) -> Result<String, String> {
-    let app_data_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
-    Ok(app_data_dir.to_string_lossy().to_string())
 }

@@ -12,13 +12,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "types": ["chrome"],
     "ignoreDeprecations": "6.0",
     "paths": {
       "~*": ["./src/*"],
       "@/*": ["./src/*"]
     }
   },
-  "include": [".wxt/wxt.d.ts", "src/**/*.ts", "src/**/*.tsx", "wxt.config.ts"],
-  "exclude": ["node_modules", ".output"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist", "src-tauri"]
 }
