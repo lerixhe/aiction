@@ -4,17 +4,17 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  root: 'src/entrypoints/desktop',
+  root: 'src/entrypoints',
   base: './',
   build: {
-    outDir: '../../../dist',
+    outDir: '../../dist',
     emptyOutDir: true,
     sourcemap: true,
     minify: 'esbuild',
     target: 'esnext',
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'src/entrypoints/desktop/index.html'),
+        main: path.resolve(__dirname, 'src/entrypoints/index.html'),
       },
       output: {
         entryFileNames: 'assets/[name]-[hash].js',

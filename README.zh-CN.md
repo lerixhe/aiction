@@ -1,32 +1,23 @@
-# AIction Browser
+# AIction
 
 > 选中文本 → 触发 AI → 继续对话
 
-轻量级 Chrome 扩展，为网页选中内容提供 AI 辅助。支持任意 OpenAI 兼容的 `/chat/completions` 端点。
-
-> ⚠️ **注意**：这是浏览器扩展组件。完整桌面版体验请访问 [AIction Desktop](https://github.com/lerixhe/aiction)。
+轻量级桌面应用程序，为选中内容提供 AI 辅助。基于 Tauri v2、Rust 和 React 构建。
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-yellow)](https://chromewebstore.google.com/detail/YOUR_EXTENSION_ID)
-[![Version](https://img.shields.io/badge/version-0.3.0-green)](package.json)
+[![Version](https://img.shields.io/badge/version-0.1.0-green)](package.json)
 
 **[English](./README.md)**
 
 ## 功能特性
 
-### 功能演示
-
-![功能演示](./docs/images/demo.gif)
-
 **内联 AI 工具栏**
 
-在任意网页选中文本，工具栏随即出现，提供可配置的 AI 动作。
-![toolbar](./docs/images/bar.png)
+在任意位置选中文本，工具栏随即出现，提供可配置的 AI 动作。
 
 **浮动聊天面板**
 
 在可拖拽、可调整大小的面板中继续对话，支持流式响应。
-![chatwindow](./docs/images/chat.png)
 
 **自定义动作**
 
@@ -37,48 +28,42 @@
 | 解释 | `帮我解释选中内容「{text}」` |
 | 翻译 | `请将以下内容翻译为简体中文：\n{text}` |
 
-![自定义](./docs/images/actions.jpg)
-
 **多模型支持**
 
 OpenAI、Anthropic Claude、Google Gemini、DeepSeek、OpenRouter，或任何 OpenAI 兼容 API。
-
-![API提供商](./docs/images/providers.jpg)
 
 **其他功能**
 
 - 思维链展示 — 查看模型推理过程（DeepSeek `reasoning_content` 等）
 - 深色模式 — 自动 / 浅色 / 深色主题
-- PDF 查看器 — 内置 PDF 查看器，支持 AI 辅助
-- 备份恢复 — 以 JSON 格式导入/导出配置
+- 系统托盘 — 最小化到托盘，快速访问
+- 全局快捷键 — 使用键盘快捷键触发动作
+- 剪贴板监控 — 自动检测和处理剪贴板内容
+- 文件操作 — 读取、写入和处理文件
+- Shell 命令 — 在 AI 辅助下执行系统命令
 
 ## 安装
 
-**Chrome 应用商店**（推荐）
+**下载**
 
-[从 Chrome 应用商店安装](YOUR_CHROME_WEBSTORE_LINK)
+从 [Releases](https://github.com/lerixhe/aiction/releases) 页面下载适合您平台的最新版本。
 
-**开发者模式**
+**从源码构建**
 
 ```bash
-git clone https://github.com/lerixhe/aiction-browser.git
-cd aiction-browser
-npm install
-npm run dev
+git clone https://github.com/lerixhe/aiction.git
+cd aiction
+pnpm install
+pnpm build:tauri
 ```
-
-然后：
-1. 打开 `chrome://extensions`
-2. 开启"开发者模式"
-3. 点击"加载已解压的扩展程序"
-4. 选择 `.output/chrome-mv3` 目录
 
 ## 快速上手
 
-1. 右键扩展图标 → **选项**
-2. 添加模型服务（API URL + Key + Model）
-3. 点击"测试连接"
-4. 在任意网页选中文本 → 点击工具栏 → 选择动作
+1. 启动应用程序
+2. 点击设置图标配置 AI 提供商
+3. 添加模型服务（API URL + Key + Model）
+4. 点击"测试连接"
+5. 在任意位置选中文本 → 点击工具栏 → 选择动作
 
 ## 配置
 
@@ -103,21 +88,37 @@ npm run dev
 ## 架构
 
 ```
-内容脚本（选中文本、工具栏、聊天面板）
-    ↓ chrome.runtime.connect（流式传输）
-后台服务（AI API、存储）
-    ↓ chrome.runtime.sendMessage（单次请求）
-选项页（设置、模型、动作）
+┌─────────────────────────────────────────────────────────────────┐
+│                    Tauri v2 应用程序                              │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                    Rust 后端                              │  │
+│  │  ┌─────────────┐ ┌──────────────┐ ┌───────────────────┐ │  │
+│  │  │ AI 客户端   │ │ 动作引擎     │ │ 系统集成          │ │  │
+│  │  │ (Vercel SDK)│ │              │ │                   │ │  │
+│  │  └─────────────┘ └──────────────┘ └───────────────────┘ │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                              │ Tauri IPC (invoke/events)       │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                    React 前端                             │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────────┐  │  │
+│  │  │ 动作     │ │ 聊天     │ │ 设置     │ │ 文件       │  │  │
+│  │  │ 工具栏   │ │ 面板     │ │          │ │ 拖放       │  │  │
+│  │  └──────────┘ └──────────┘ └──────────┘ └────────────┘  │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 详细架构文档：[docs/WIKI.md](docs/WIKI.md)
 
 ## 技术栈
 
-- [WXT](https://wxt.dev/) — 构建框架
+- [Tauri v2](https://tauri.app/) — 桌面框架
+- Rust — 后端语言
 - React 19 + TypeScript
+- Vite — 构建工具
+- TailwindCSS v4 — 样式框架
 - [Vercel AI SDK](https://sdk.vercel.ai/) — 流式 AI 调用
-- Chrome Manifest V3
 
 ## 开发
 
@@ -125,11 +126,11 @@ npm run dev
 
 | 命令 | 说明 |
 |------|------|
-| `npm run dev` | 开发构建，监听文件变化 |
-| `npm run dev:firefox` | Firefox 开发构建 |
-| `npm run build` | 生产构建 |
-| `npm run typecheck` | TypeScript 类型检查 |
-| `npm run zip` | 打包扩展 |
+| `pnpm dev` | 启动 Vite 开发服务器 |
+| `pnpm dev:tauri` | 启动 Tauri 开发模式 |
+| `pnpm build` | 仅构建前端 |
+| `pnpm build:tauri` | 构建完整应用程序 |
+| `pnpm typecheck` | TypeScript 类型检查 |
 
 ### 路径别名
 
@@ -141,18 +142,17 @@ import { useUiTheme } from "@/shared/ui/theme"
 
 ### 修改后验证
 
-1. 运行 `npm run typecheck` 和 `npm run build`
-2. 打开 `chrome://extensions`
-3. 点击扩展的刷新按钮
-4. 刷新目标网页
+1. 运行 `pnpm typecheck` 和 `pnpm build`
+2. 运行 `pnpm dev:tauri` 在开发模式下测试
+3. 运行 `pnpm build:tauri` 构建生产版本
 
 ## 贡献
 
 1. Fork 本仓库
 2. 创建分支：`git checkout -b feature/xxx`
 3. 进行修改
-4. 运行 `npm run typecheck` 和 `npm run build`
-5. 在 Chrome 中测试
+4. 运行 `pnpm typecheck` 和 `pnpm build`
+5. 测试应用程序
 6. 提交 Pull Request
 
 ## 许可证

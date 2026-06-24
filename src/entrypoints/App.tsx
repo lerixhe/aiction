@@ -38,7 +38,7 @@ function App() {
   if (state.isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-pulse text-primary text-xl">Loading AIction Desktop...</div>
+        <div className="animate-pulse text-primary text-xl">Loading AIction...</div>
       </div>
     );
   }
@@ -63,7 +63,7 @@ function App() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">A</span>
             </div>
-            <h1 className="text-xl font-bold">AIction Desktop</h1>
+            <h1 className="text-xl font-bold">AIction</h1>
           </div>
           <div className="text-text-muted text-sm">
             v{state.version}
@@ -76,7 +76,7 @@ function App() {
         <div className="max-w-4xl mx-auto">
           {/* Welcome Section */}
           <div className="bg-bg-card rounded-xl p-6 mb-6 border border-border">
-            <h2 className="text-2xl font-bold mb-4">Welcome to AIction Desktop</h2>
+            <h2 className="text-2xl font-bold mb-4">Welcome to AIction</h2>
             <p className="text-text-muted mb-4">
               A lightweight AI + Actions efficiency tool. Select text, trigger actions, and get AI assistance.
             </p>

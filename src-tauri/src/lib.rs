@@ -17,7 +17,7 @@ pub fn run() {
       let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
       std::fs::create_dir_all(&app_data_dir).expect("failed to create app data dir");
       
-      log::info!("AIction Desktop started");
+      log::info!("AIction started");
       log::info!("App data directory: {:?}", app_data_dir);
       
       Ok(())
@@ -64,7 +64,7 @@ pub fn run() {
 
 #[tauri::command]
 fn greet(name: &str) -> String {
-    format!("Hello, {}! Welcome to AIction Desktop.", name)
+    format!("Hello, {}! Welcome to AIction.", name)
 }
 
 #[tauri::command]

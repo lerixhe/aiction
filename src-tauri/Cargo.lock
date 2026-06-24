@@ -29,7 +29,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "aiction-desktop"
+name = "aiction"
 version = "0.1.0"
 dependencies = [
  "anyhow",

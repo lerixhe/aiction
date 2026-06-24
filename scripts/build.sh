@@ -1,10 +1,10 @@
 #!/bin/bash
 
-echo "=== AIction Desktop Build Script ==="
+echo "=== AIction Build Script ==="
 echo ""
 
 echo "1. Building frontend..."
-pnpm build:desktop
+pnpm build
 if [ $? -ne 0 ]; then
     echo "❌ Frontend build failed"
     exit 1
@@ -34,7 +34,7 @@ echo "=== Build Complete ==="
 echo "Application built successfully!"
 echo ""
 echo "To run in development mode:"
-echo "  pnpm dev:tauri"
+echo "  pnpm dev"
 echo ""
 echo "To build for production:"
 echo "  pnpm build:tauri"

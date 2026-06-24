@@ -1,32 +1,23 @@
-# AIction Browser
+# AIction
 
 > Select text → Trigger AI → Continue in chat
 
-A lightweight Chrome extension for getting AI help on selected web content. Supports any OpenAI-compatible `/chat/completions` endpoint.
-
-> ⚠️ **Note**: This is the browser extension component. For the full desktop experience, see [AIction Desktop](https://github.com/lerixhe/aiction).
+A lightweight desktop application for getting AI help on selected content. Built with Tauri v2, Rust, and React.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-yellow)](https://chromewebstore.google.com/detail/YOUR_EXTENSION_ID)
-[![Version](https://img.shields.io/badge/version-0.3.0-green)](package.json)
+[![Version](https://img.shields.io/badge/version-0.1.0-green)](package.json)
 
 **[中文](./README.zh-CN.md)**
 
 ## Features
 
-### Feature Demo
-
-![Feature Demo](./docs/images/demo.gif)
-
 **Inline AI Toolbar**
 
-Select text on any page, a toolbar appears with configurable actions.
-![Toolbar](./docs/images/bar.png)
+Select text anywhere, a toolbar appears with configurable actions.
 
 **Floating Chat Panel**
 
 Continue the conversation in a draggable, resizable panel with streaming responses.
-![chatwindow](./docs/images/chat.png)
 
 **Custom Actions**
 
@@ -37,48 +28,42 @@ Create your own prompt templates with `{text}` placeholders. Built-in actions:
 | Explain | `Explain the selected content: "{text}"` |
 | Translate | `Translate the following to English:\n{text}` |
 
-![Custom Actions](./docs/images/actions.jpg)
-
 **Multi-Provider Support**
 
 OpenAI, Anthropic Claude, Google Gemini, DeepSeek, OpenRouter, or any OpenAI-compatible API.
-
-![API Providers](./docs/images/providers.jpg)
 
 **Other Features**
 
 - Reasoning display — view model thinking process (DeepSeek `reasoning_content`, etc.)
 - Dark mode — auto / light / dark theme
-- PDF viewer — built-in PDF viewer with AI assistance
-- Backup & restore — export/import settings as JSON
+- System tray — minimize to tray for quick access
+- Global shortcuts — trigger actions with keyboard shortcuts
+- Clipboard monitoring — automatically detect and process clipboard content
+- File operations — read, write, and process files
+- Shell commands — execute system commands with AI assistance
 
 ## Install
 
-**Chrome Web Store** (recommended)
+**Download**
 
-[Install from Chrome Web Store](YOUR_CHROME_WEBSTORE_LINK)
+Download the latest release for your platform from the [Releases](https://github.com/lerixhe/aiction/releases) page.
 
-**Developer Mode**
+**Build from Source**
 
 ```bash
-git clone https://github.com/lerixhe/aiction-browser.git
-cd aiction-browser
-npm install
-npm run dev
+git clone https://github.com/lerixhe/aiction.git
+cd aiction
+pnpm install
+pnpm build:tauri
 ```
-
-Then:
-1. Open `chrome://extensions`
-2. Enable "Developer mode"
-3. Click "Load unpacked"
-4. Select the `.output/chrome-mv3` directory
 
 ## Quick Start
 
-1. Right-click the extension icon → **Options**
-2. Add a model service (API URL + Key + Model)
-3. Click "Test Connection"
-4. Select text on any page → click the toolbar → choose an action
+1. Launch the application
+2. Click the settings icon to configure your AI provider
+3. Add a model service (API URL + Key + Model)
+4. Click "Test Connection"
+5. Select text anywhere → click the toolbar → choose an action
 
 ## Configuration
 
@@ -103,21 +88,37 @@ Then:
 ## Architecture
 
 ```
-Content Script (selection, toolbar, chat panel)
-    ↓ chrome.runtime.connect (streaming)
-Background (AI API, storage)
-    ↓ chrome.runtime.sendMessage (one-shot)
-Options (settings, models, actions)
+┌─────────────────────────────────────────────────────────────────┐
+│                    Tauri v2 Application                          │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                    Rust Backend                           │  │
+│  │  ┌─────────────┐ ┌──────────────┐ ┌───────────────────┐ │  │
+│  │  │ AI Client   │ │ Action       │ │ System            │ │  │
+│  │  │ (Vercel SDK)│ │ Engine       │ │ Integration       │ │  │
+│  │  └─────────────┘ └──────────────┘ └───────────────────┘ │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                              │ Tauri IPC (invoke/events)       │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                    React Frontend                         │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────────┐  │  │
+│  │  │ Action   │ │ Chat     │ │ Settings │ │ File       │  │  │
+│  │  │ Toolbar  │ │ Panel    │ │          │ │ Drop       │  │  │
+│  │  └──────────┘ └──────────┘ └──────────┘ └────────────┘  │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 Detailed architecture: [docs/WIKI.md](docs/WIKI.md)
 
 ## Tech Stack
 
-- [WXT](https://wxt.dev/) — build framework
+- [Tauri v2](https://tauri.app/) — desktop framework
+- Rust — backend language
 - React 19 + TypeScript
+- Vite — build tool
+- TailwindCSS v4 — styling
 - [Vercel AI SDK](https://sdk.vercel.ai/) — streaming AI calls
-- Chrome Manifest V3
 
 ## Development
 
@@ -125,11 +126,11 @@ Detailed architecture: [docs/WIKI.md](docs/WIKI.md)
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Dev build with file watching |
-| `npm run dev:firefox` | Dev build for Firefox |
-| `npm run build` | Production build |
-| `npm run typecheck` | TypeScript type checking |
-| `npm run zip` | Package extension bundle |
+| `pnpm dev` | Start Vite dev server |
+| `pnpm dev:tauri` | Start Tauri development mode |
+| `pnpm build` | Build frontend only |
+| `pnpm build:tauri` | Build complete application |
+| `pnpm typecheck` | TypeScript type checking |
 
 ### Path Aliases
 
@@ -141,18 +142,17 @@ import { useUiTheme } from "@/shared/ui/theme"
 
 ### After Making Changes
 
-1. Run `npm run typecheck` and `npm run build`
-2. Go to `chrome://extensions`
-3. Click the reload button on your extension
-4. Reload the target web page
+1. Run `pnpm typecheck` and `pnpm build`
+2. Run `pnpm dev:tauri` to test in development mode
+3. Run `pnpm build:tauri` to build for production
 
 ## Contributing
 
 1. Fork the repository
 2. Create a branch: `git checkout -b feature/xxx`
 3. Make your changes
-4. Run `npm run typecheck` and `npm run build`
-5. Test in Chrome
+4. Run `pnpm typecheck` and `pnpm build`
+5. Test the application
 6. Submit a pull request
 
 ## License
