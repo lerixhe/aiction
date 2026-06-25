@@ -20,6 +20,9 @@ pub enum AppError {
     #[error("Window error: {0}")]
     Window(String),
 
+    #[error("Selection error: {0}")]
+    Selection(String),
+
     #[error("{0}")]
     Custom(String),
 }

@@ -23,11 +23,18 @@ export const TAURI_COMMANDS = {
   HIDE_CHAT_WINDOW: "hide_chat_window",
   POSITION_TOOLBAR: "position_toolbar",
   RESIZE_TOOLBAR: "resize_toolbar",
+  // selection commands
+  GET_SELECTED_TEXT: "get_selected_text",
+  TAKE_PENDING_SELECTION: "take_pending_selection",
+  HAS_PENDING_SELECTION: "has_pending_selection",
+  GET_CURSOR_POSITION: "get_cursor_position",
+  CALCULATE_TOOLBAR_POSITION: "calculate_toolbar_position",
 } as const;
 
 // Tauri 事件名称常量
 export const TAURI_EVENTS = {
   STATE_CHANGED: "state:changed",
+  SELECTION_CHANGED: "selection:changed",
 } as const;
 
 // 事件载荷类型
@@ -46,9 +53,38 @@ export interface SizePayload {
   height: number;
 }
 
+// 选区相关类型
+export interface CursorPosition {
+  x: number;
+  y: number;
+}
+
+export interface SelectionResult {
+  text: string;
+  position?: CursorPosition;
+}
+
+export type SelectionState =
+  | { Text: SelectionResult }
+  | "Empty"
+  | "Unavailable";
+
+export interface ToolbarPosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface SelectionResponse {
+  state: SelectionState;
+  toolbar_position?: ToolbarPosition;
+}
+
 // 应用状态类型
 export interface AppStateSnapshot {
   initialized: boolean;
+  has_pending_selection: boolean;
 }
 
 // 窗口标签

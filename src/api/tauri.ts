@@ -2,8 +2,12 @@ import { invoke } from "@tauri-apps/api/core";
 import {
   TAURI_COMMANDS,
   type AppStateSnapshot,
+  type CursorPosition,
   type PositionPayload,
+  type SelectionResponse,
+  type SelectionResult,
   type SizePayload,
+  type ToolbarPosition,
 } from "~/shared/events";
 import type { AppSettings, SettingsUpdate } from "~/shared/types";
 
@@ -85,4 +89,35 @@ export async function positionToolbar(position: PositionPayload): Promise<void> 
 
 export async function resizeToolbar(size: SizePayload): Promise<void> {
   await invoke(TAURI_COMMANDS.RESIZE_TOOLBAR, { size });
+}
+
+// 选区命令
+export async function getSelectedText(): Promise<SelectionResponse> {
+  return await invoke<SelectionResponse>(TAURI_COMMANDS.GET_SELECTED_TEXT);
+}
+
+export async function takePendingSelection(): Promise<SelectionResult | null> {
+  return await invoke<SelectionResult | null>(TAURI_COMMANDS.TAKE_PENDING_SELECTION);
+}
+
+export async function hasPendingSelection(): Promise<boolean> {
+  return await invoke<boolean>(TAURI_COMMANDS.HAS_PENDING_SELECTION);
+}
+
+export async function getCursorPosition(): Promise<CursorPosition | null> {
+  return await invoke<CursorPosition | null>(TAURI_COMMANDS.GET_CURSOR_POSITION);
+}
+
+export async function calculateToolbarPosition(
+  cursorX: number,
+  cursorY: number,
+  toolbarWidth: number,
+  toolbarHeight: number
+): Promise<ToolbarPosition> {
+  return await invoke<ToolbarPosition>(TAURI_COMMANDS.CALCULATE_TOOLBAR_POSITION, {
+    cursorX,
+    cursorY,
+    toolbarWidth,
+    toolbarHeight,
+  });
 }

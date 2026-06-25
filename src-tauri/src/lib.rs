@@ -1,12 +1,17 @@
 mod commands;
 mod error;
 mod events;
+mod selection;
 mod settings;
 mod settings_store;
 mod shortcuts;
 mod state;
 mod tray;
 mod windows;
+
+#[cfg(target_os = "macos")]
+#[macro_use]
+extern crate objc;
 
 use state::AppState;
 
@@ -51,6 +56,12 @@ pub fn run() {
             commands::hide_chat_window,
             commands::position_toolbar,
             commands::resize_toolbar,
+            // selection commands
+            commands::get_selected_text,
+            commands::take_pending_selection,
+            commands::has_pending_selection,
+            commands::get_cursor_position,
+            commands::calculate_toolbar_position,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
