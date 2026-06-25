@@ -1,3 +1,4 @@
+mod ai;
 mod commands;
 mod error;
 mod events;
@@ -13,6 +14,7 @@ mod windows;
 #[macro_use]
 extern crate objc;
 
+use tauri::Manager;
 use state::AppState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -28,6 +30,14 @@ pub fn run() {
         .manage(AppState::default())
         .setup(|app| {
             settings_store::init_settings_store(app.handle())?;
+
+            // Load settings into AppState
+            let settings = settings_store::load_settings().unwrap_or_default();
+            let state = app.state::<AppState>();
+            state.update_settings(settings).unwrap_or_else(|e| {
+                log::error!("Failed to load settings into state: {}", e);
+            });
+
             tray::create_tray(app)?;
             shortcuts::register_shortcuts(app)?;
             Ok(())
@@ -62,6 +72,13 @@ pub fn run() {
             commands::has_pending_selection,
             commands::get_cursor_position,
             commands::calculate_toolbar_position,
+            // ai commands
+            commands::stream_chat,
+            commands::chat,
+            commands::abort_chat,
+            commands::execute_action,
+            commands::test_provider,
+            commands::get_models,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

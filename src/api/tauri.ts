@@ -2,11 +2,19 @@ import { invoke } from "@tauri-apps/api/core";
 import {
   TAURI_COMMANDS,
   type AppStateSnapshot,
+  type ChatResponse,
   type CursorPosition,
+  type ExecuteActionRequest,
+  type GetModelsRequest,
+  type GetModelsResponse,
   type PositionPayload,
   type SelectionResponse,
   type SelectionResult,
   type SizePayload,
+  type StreamChatRequest,
+  type StreamChatResponse,
+  type TestProviderRequest,
+  type TestProviderResponse,
   type ToolbarPosition,
 } from "~/shared/events";
 import type { AppSettings, SettingsUpdate } from "~/shared/types";
@@ -120,4 +128,29 @@ export async function calculateToolbarPosition(
     toolbarWidth,
     toolbarHeight,
   });
+}
+
+// AI 命令
+export async function streamChat(request: StreamChatRequest): Promise<StreamChatResponse> {
+  return await invoke<StreamChatResponse>(TAURI_COMMANDS.STREAM_CHAT, { request });
+}
+
+export async function chat(request: StreamChatRequest): Promise<ChatResponse> {
+  return await invoke<ChatResponse>(TAURI_COMMANDS.CHAT, { request });
+}
+
+export async function abortChat(streamId: string): Promise<boolean> {
+  return await invoke<boolean>(TAURI_COMMANDS.ABORT_CHAT, { request: { streamId } });
+}
+
+export async function executeAction(request: ExecuteActionRequest): Promise<ChatResponse> {
+  return await invoke<ChatResponse>(TAURI_COMMANDS.EXECUTE_ACTION, { request });
+}
+
+export async function testProvider(request: TestProviderRequest): Promise<TestProviderResponse> {
+  return await invoke<TestProviderResponse>(TAURI_COMMANDS.TEST_PROVIDER, { request });
+}
+
+export async function getModels(request: GetModelsRequest): Promise<GetModelsResponse> {
+  return await invoke<GetModelsResponse>(TAURI_COMMANDS.GET_MODELS, { request });
 }

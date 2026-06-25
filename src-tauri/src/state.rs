@@ -3,6 +3,8 @@ use std::sync::Mutex;
 
 use crate::error::AppError;
 use crate::selection::SelectionResult;
+use crate::settings::AppSettings;
+use crate::settings_store;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct AppStateSnapshot {
@@ -13,6 +15,7 @@ pub struct AppStateSnapshot {
 pub struct AppState {
     initialized: Mutex<bool>,
     pending_selection: Mutex<Option<SelectionResult>>,
+    settings: Mutex<AppSettings>,
 }
 
 impl AppState {
@@ -20,6 +23,7 @@ impl AppState {
         Self {
             initialized: Mutex::new(false),
             pending_selection: Mutex::new(None),
+            settings: Mutex::new(AppSettings::default()),
         }
     }
 
@@ -52,6 +56,19 @@ impl AppState {
     pub fn has_pending_selection(&self) -> Result<bool, AppError> {
         let pending = Self::lock_mutex(&self.pending_selection, "pending_selection")?;
         Ok(pending.is_some())
+    }
+
+    pub fn get_settings(&self) -> Result<AppSettings, AppError> {
+        let settings = Self::lock_mutex(&self.settings, "settings")?;
+        Ok(settings.clone())
+    }
+
+    pub fn update_settings(&self, new_settings: AppSettings) -> Result<(), AppError> {
+        let mut settings = Self::lock_mutex(&self.settings, "settings")?;
+        *settings = new_settings.clone();
+        drop(settings);
+        settings_store::save_settings(&new_settings)?;
+        Ok(())
     }
 
     pub fn snapshot(&self) -> Result<AppStateSnapshot, AppError> {

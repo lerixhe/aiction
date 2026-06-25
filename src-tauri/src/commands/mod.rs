@@ -1,9 +1,11 @@
+pub mod ai;
 pub mod basic;
 pub mod selection;
 pub mod settings;
 pub mod state;
 pub mod window;
 
+pub use ai::*;
 pub use basic::*;
 pub use selection::*;
 pub use settings::*;

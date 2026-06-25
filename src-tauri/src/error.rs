@@ -23,6 +23,9 @@ pub enum AppError {
     #[error("Selection error: {0}")]
     Selection(String),
 
+    #[error("AI API error ({code}): {message}")]
+    AiApi { code: String, message: String },
+
     #[error("{0}")]
     Custom(String),
 }

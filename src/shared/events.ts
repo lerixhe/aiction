@@ -29,12 +29,20 @@ export const TAURI_COMMANDS = {
   HAS_PENDING_SELECTION: "has_pending_selection",
   GET_CURSOR_POSITION: "get_cursor_position",
   CALCULATE_TOOLBAR_POSITION: "calculate_toolbar_position",
+  // ai commands
+  STREAM_CHAT: "stream_chat",
+  CHAT: "chat",
+  ABORT_CHAT: "abort_chat",
+  EXECUTE_ACTION: "execute_action",
+  TEST_PROVIDER: "test_provider",
+  GET_MODELS: "get_models",
 } as const;
 
 // Tauri 事件名称常量
 export const TAURI_EVENTS = {
   STATE_CHANGED: "state:changed",
   SELECTION_CHANGED: "selection:changed",
+  CHAT_STREAM_PREFIX: "chat-stream:",
 } as const;
 
 // 事件载荷类型
@@ -89,3 +97,66 @@ export interface AppStateSnapshot {
 
 // 窗口标签
 export type WindowLabel = "main" | "toolbar" | "chat";
+
+// AI 相关类型
+export interface ChatMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+export interface StreamChatRequest {
+  providerId: string;
+  model: string;
+  messages: ChatMessage[];
+  temperature?: number;
+  maxTokens?: number;
+}
+
+export interface StreamChatResponse {
+  streamId: string;
+}
+
+export interface StreamChunk {
+  id: string;
+  delta: string;
+  reasoningDelta?: string;
+  finishReason?: string;
+}
+
+export interface ChatResponse {
+  id: string;
+  content: string;
+  model: string;
+  usage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+  finishReason?: string;
+}
+
+export interface ExecuteActionRequest {
+  actionId: string;
+  selection: string;
+  variables?: Record<string, string>;
+  providerId?: string;
+  model?: string;
+}
+
+export interface TestProviderRequest {
+  providerId: string;
+}
+
+export interface TestProviderResponse {
+  success: boolean;
+  message: string;
+  models?: string[];
+}
+
+export interface GetModelsRequest {
+  providerId: string;
+}
+
+export interface GetModelsResponse {
+  models: string[];
+}
