@@ -1,7 +1,10 @@
 use serde::{Deserialize, Serialize};
-use std::sync::Mutex;
+use std::sync::{Mutex, OnceLock};
+use std::sync::Arc;
 
 use crate::error::AppError;
+
+type SettingsStore = Arc<tauri_plugin_store::Store<tauri::Wry>>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AiConfig {
@@ -31,6 +34,7 @@ pub struct AppState {
     initialized: Mutex<bool>,
     ai_config: Mutex<AiConfig>,
     clipboard_monitor_active: Mutex<bool>,
+    settings_store: OnceLock<SettingsStore>,
 }
 
 impl AppState {
@@ -39,7 +43,24 @@ impl AppState {
             initialized: Mutex::new(false),
             ai_config: Mutex::new(AiConfig::default()),
             clipboard_monitor_active: Mutex::new(false),
+            settings_store: OnceLock::new(),
         }
+    }
+
+    pub fn init_settings_store(&self, app: &tauri::AppHandle) -> Result<(), AppError> {
+        let store = tauri_plugin_store::StoreBuilder::new(app, "settings.json")
+            .build()
+            .map_err(|e| AppError::Custom(format!("Failed to create store: {}", e)))?;
+        self.settings_store
+            .set(store)
+            .map_err(|_| AppError::Custom("Store already initialized".to_string()))?;
+        Ok(())
+    }
+
+    pub fn get_settings_store(&self) -> Result<&SettingsStore, AppError> {
+        self.settings_store
+            .get()
+            .ok_or_else(|| AppError::Custom("Store not initialized".to_string()))
     }
 
     fn lock_mutex<'a, T>(mutex: &'a Mutex<T>, name: &str) -> Result<std::sync::MutexGuard<'a, T>, AppError> {
