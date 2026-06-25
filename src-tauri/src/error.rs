@@ -11,6 +11,12 @@ pub enum AppError {
     #[error("Tauri error: {0}")]
     Tauri(#[from] tauri::Error),
 
+    #[error("Lock error: {0}")]
+    Lock(String),
+
+    #[error("Validation error: {0}")]
+    Validation(String),
+
     #[error("{0}")]
     Custom(String),
 }

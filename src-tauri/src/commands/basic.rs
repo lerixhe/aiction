@@ -1,6 +1,7 @@
+use tauri::State;
+
 use crate::error::AppResult;
 use crate::state::AppState;
-use tauri::State;
 
 #[tauri::command]
 pub fn greet(name: &str) -> String {
@@ -14,9 +15,6 @@ pub fn get_version() -> String {
 
 #[tauri::command]
 pub fn initialize(state: State<'_, AppState>) -> AppResult<bool> {
-    let mut initialized = state.initialized.lock().map_err(|e| {
-        crate::error::AppError::Custom(format!("Failed to lock state: {}", e))
-    })?;
-    *initialized = true;
+    state.set_initialized(true)?;
     Ok(true)
 }
