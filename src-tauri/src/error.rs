@@ -17,6 +17,9 @@ pub enum AppError {
     #[error("Validation error: {0}")]
     Validation(String),
 
+    #[error("Window error: {0}")]
+    Window(String),
+
     #[error("{0}")]
     Custom(String),
 }

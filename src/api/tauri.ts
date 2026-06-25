@@ -2,6 +2,8 @@ import { invoke } from "@tauri-apps/api/core";
 import {
   TAURI_COMMANDS,
   type AppStateSnapshot,
+  type PositionPayload,
+  type SizePayload,
 } from "~/shared/events";
 import type { AppSettings, SettingsUpdate } from "~/shared/types";
 
@@ -50,4 +52,37 @@ export async function importSettingsFromFile(): Promise<AppSettings | null> {
 
 export async function resetSettings(): Promise<AppSettings> {
   return await invoke<AppSettings>(TAURI_COMMANDS.RESET_SETTINGS);
+}
+
+// 窗口命令
+export async function showMainWindow(): Promise<void> {
+  await invoke(TAURI_COMMANDS.SHOW_MAIN_WINDOW);
+}
+
+export async function toggleMainWindow(): Promise<void> {
+  await invoke(TAURI_COMMANDS.TOGGLE_MAIN_WINDOW);
+}
+
+export async function showToolbarWindow(): Promise<void> {
+  await invoke(TAURI_COMMANDS.SHOW_TOOLBAR_WINDOW);
+}
+
+export async function hideToolbarWindow(): Promise<void> {
+  await invoke(TAURI_COMMANDS.HIDE_TOOLBAR_WINDOW);
+}
+
+export async function showChatWindow(): Promise<void> {
+  await invoke(TAURI_COMMANDS.SHOW_CHAT_WINDOW);
+}
+
+export async function hideChatWindow(): Promise<void> {
+  await invoke(TAURI_COMMANDS.HIDE_CHAT_WINDOW);
+}
+
+export async function positionToolbar(position: PositionPayload): Promise<void> {
+  await invoke(TAURI_COMMANDS.POSITION_TOOLBAR, { position });
+}
+
+export async function resizeToolbar(size: SizePayload): Promise<void> {
+  await invoke(TAURI_COMMANDS.RESIZE_TOOLBAR, { size });
 }

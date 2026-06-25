@@ -1,7 +1,10 @@
+import { Router } from "~/components/Router";
+import { ToolbarPlaceholder } from "~/components/ToolbarPlaceholder";
+import { ChatPlaceholder } from "~/components/ChatPlaceholder";
 import { useState } from "react";
 import { greet, getVersion } from "~/api/tauri";
 
-function App() {
+function MainContent() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
   const [version, setVersion] = useState("");
@@ -63,6 +66,16 @@ function App() {
         </div>
       </div>
     </main>
+  );
+}
+
+function App() {
+  return (
+    <Router
+      main={<MainContent />}
+      toolbar={<ToolbarPlaceholder />}
+      chat={<ChatPlaceholder />}
+    />
   );
 }
 
