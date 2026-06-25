@@ -4,7 +4,8 @@ use serde::{Deserialize, Serialize};
 pub struct ProviderConfig {
     pub id: String,
     pub name: String,
-    pub api_key: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub api_key: Option<String>,
     pub base_url: String,
     pub models: Vec<String>,
     pub default_model: String,
@@ -152,7 +153,7 @@ impl Default for ProviderConfig {
         Self {
             id: "openai".to_string(),
             name: "OpenAI".to_string(),
-            api_key: String::new(),
+            api_key: None,
             base_url: "https://api.openai.com/v1".to_string(),
             models: vec![
                 "gpt-4o".to_string(),

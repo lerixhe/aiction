@@ -107,6 +107,8 @@ export const BUILT_IN_ACTIONS: ActionTemplate[] = [
   },
 ]
 
+// 注意：这些默认值仅作为前端回退使用
+// 实际默认值由后端 settings.rs 提供，通过 getSettings() 获取
 export const SETTINGS_VERSION = 1
 
 export const DEFAULT_SETTINGS: AppSettings = {

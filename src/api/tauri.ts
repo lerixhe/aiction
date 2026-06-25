@@ -1,17 +1,11 @@
 import { invoke } from "@tauri-apps/api/core";
-import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import {
   TAURI_COMMANDS,
-  TAURI_EVENTS,
-  type SelectionChangedPayload,
-  type AiStreamDeltaPayload,
-  type AiStreamErrorPayload,
-  type StateChangedPayload,
   type AppStateSnapshot,
-  type AiConfig,
 } from "~/shared/events";
+import type { AppSettings, SettingsUpdate } from "~/shared/types";
 
-// 命令调用封装
+// 基础命令
 export async function greet(name: string): Promise<string> {
   return await invoke<string>(TAURI_COMMANDS.GREET, { name });
 }
@@ -24,59 +18,36 @@ export async function initialize(): Promise<boolean> {
   return await invoke<boolean>(TAURI_COMMANDS.INITIALIZE);
 }
 
+// 状态命令
 export async function getAppState(): Promise<AppStateSnapshot> {
   return await invoke<AppStateSnapshot>(TAURI_COMMANDS.GET_APP_STATE);
 }
 
-export async function updateAiConfig(update: Partial<AiConfig>): Promise<void> {
-  await invoke(TAURI_COMMANDS.UPDATE_AI_CONFIG, { update });
+// 设置命令
+export async function getSettings(): Promise<AppSettings> {
+  return await invoke<AppSettings>(TAURI_COMMANDS.GET_SETTINGS);
 }
 
-// 事件监听封装
-export function onSelectionChanged(
-  callback: (payload: SelectionChangedPayload) => void
-): Promise<UnlistenFn> {
-  return listen<SelectionChangedPayload>(
-    TAURI_EVENTS.SELECTION_CHANGED,
-    (event) => callback(event.payload)
-  );
+export async function updateSettings(update: SettingsUpdate): Promise<AppSettings> {
+  return await invoke<AppSettings>(TAURI_COMMANDS.UPDATE_SETTINGS, { update });
 }
 
-export function onAiStreamStart(
-  callback: () => void
-): Promise<UnlistenFn> {
-  return listen(TAURI_EVENTS.AI_STREAM_START, () => callback());
+export async function exportSettings(): Promise<string> {
+  return await invoke<string>(TAURI_COMMANDS.EXPORT_SETTINGS);
 }
 
-export function onAiStreamDelta(
-  callback: (payload: AiStreamDeltaPayload) => void
-): Promise<UnlistenFn> {
-  return listen<AiStreamDeltaPayload>(
-    TAURI_EVENTS.AI_STREAM_DELTA,
-    (event) => callback(event.payload)
-  );
+export async function exportSettingsToFile(): Promise<boolean> {
+  return await invoke<boolean>(TAURI_COMMANDS.EXPORT_SETTINGS_TO_FILE);
 }
 
-export function onAiStreamEnd(
-  callback: () => void
-): Promise<UnlistenFn> {
-  return listen(TAURI_EVENTS.AI_STREAM_END, () => callback());
+export async function importSettings(json: string): Promise<AppSettings> {
+  return await invoke<AppSettings>(TAURI_COMMANDS.IMPORT_SETTINGS, { json });
 }
 
-export function onAiStreamError(
-  callback: (payload: AiStreamErrorPayload) => void
-): Promise<UnlistenFn> {
-  return listen<AiStreamErrorPayload>(
-    TAURI_EVENTS.AI_STREAM_ERROR,
-    (event) => callback(event.payload)
-  );
+export async function importSettingsFromFile(): Promise<AppSettings | null> {
+  return await invoke<AppSettings | null>(TAURI_COMMANDS.IMPORT_SETTINGS_FROM_FILE);
 }
 
-export function onStateChanged(
-  callback: (payload: StateChangedPayload) => void
-): Promise<UnlistenFn> {
-  return listen<StateChangedPayload>(
-    TAURI_EVENTS.STATE_CHANGED,
-    (event) => callback(event.payload)
-  );
+export async function resetSettings(): Promise<AppSettings> {
+  return await invoke<AppSettings>(TAURI_COMMANDS.RESET_SETTINGS);
 }

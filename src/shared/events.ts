@@ -1,53 +1,33 @@
 // Tauri 命令名称常量
 export const TAURI_COMMANDS = {
+  // basic commands
   GREET: "greet",
   GET_VERSION: "get_version",
   INITIALIZE: "initialize",
+  // state commands
   GET_APP_STATE: "get_app_state",
-  UPDATE_AI_CONFIG: "update_ai_config",
+  // settings commands
+  GET_SETTINGS: "get_settings",
+  UPDATE_SETTINGS: "update_settings",
+  EXPORT_SETTINGS: "export_settings",
+  EXPORT_SETTINGS_TO_FILE: "export_settings_to_file",
+  IMPORT_SETTINGS: "import_settings",
+  IMPORT_SETTINGS_FROM_FILE: "import_settings_from_file",
+  RESET_SETTINGS: "reset_settings",
 } as const;
 
 // Tauri 事件名称常量
 export const TAURI_EVENTS = {
-  SELECTION_CHANGED: "selection:changed",
-  AI_STREAM_START: "ai:stream:start",
-  AI_STREAM_DELTA: "ai:stream:delta",
-  AI_STREAM_END: "ai:stream:end",
-  AI_STREAM_ERROR: "ai:stream:error",
   STATE_CHANGED: "state:changed",
 } as const;
 
 // 事件载荷类型
-export interface SelectionChangedPayload {
-  text: string;
-  app_name?: string;
-  window_title?: string;
-}
-
-export interface AiStreamDeltaPayload {
-  delta: string;
-  reasoning?: string;
-}
-
-export interface AiStreamErrorPayload {
-  code: string;
-  message: string;
-}
-
 export interface StateChangedPayload {
   key: string;
   value: unknown;
 }
 
 // 应用状态类型
-export interface AiConfig {
-  api_key?: string;
-  model?: string;
-  provider?: string;
-}
-
 export interface AppStateSnapshot {
   initialized: boolean;
-  ai_config: AiConfig;
-  clipboard_monitor_active: boolean;
 }

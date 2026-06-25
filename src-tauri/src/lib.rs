@@ -2,9 +2,9 @@ mod commands;
 mod error;
 mod events;
 mod settings;
+mod settings_store;
 mod state;
 
-use tauri::Manager;
 use state::AppState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -17,8 +17,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .manage(AppState::default())
         .setup(|app| {
-            let state = app.state::<AppState>();
-            state.init_settings_store(app.handle())?;
+            settings_store::init_settings_store(app.handle())?;
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -28,7 +27,6 @@ pub fn run() {
             commands::initialize,
             // state commands
             commands::get_app_state,
-            commands::update_ai_config,
             // settings commands
             commands::get_settings,
             commands::update_settings,

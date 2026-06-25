@@ -5,12 +5,13 @@ use tauri_plugin_dialog::DialogExt;
 
 use crate::error::AppError;
 use crate::settings::{AppSettings, SettingsUpdate};
+use crate::settings_store;
 use crate::state::AppState;
 
 const SETTINGS_KEY: &str = "app_settings";
 
-fn load_settings_from_store(state: &AppState) -> Result<AppSettings, AppError> {
-    let store = state.get_settings_store()?;
+fn load_settings_from_store() -> Result<AppSettings, AppError> {
+    let store = settings_store::get_settings_store()?;
 
     match store.get(SETTINGS_KEY) {
         Some(value) => {
@@ -22,8 +23,8 @@ fn load_settings_from_store(state: &AppState) -> Result<AppSettings, AppError> {
     }
 }
 
-fn save_settings_to_store(state: &AppState, settings: &AppSettings) -> Result<(), AppError> {
-    let store = state.get_settings_store()?;
+fn save_settings_to_store(settings: &AppSettings) -> Result<(), AppError> {
+    let store = settings_store::get_settings_store()?;
 
     let value = serde_json::to_value(settings)
         .map_err(|e| AppError::Custom(format!("Failed to serialize settings: {}", e)))?;
@@ -38,32 +39,32 @@ fn save_settings_to_store(state: &AppState, settings: &AppSettings) -> Result<()
 }
 
 #[command]
-pub async fn get_settings(state: State<'_, AppState>) -> Result<AppSettings, AppError> {
-    let mut settings = load_settings_from_store(&state)?;
+pub async fn get_settings(_state: State<'_, AppState>) -> Result<AppSettings, AppError> {
+    let mut settings = load_settings_from_store()?;
     settings.sanitize();
     Ok(settings)
 }
 
 #[command]
-pub async fn update_settings(state: State<'_, AppState>, update: SettingsUpdate) -> Result<AppSettings, AppError> {
-    let mut settings = load_settings_from_store(&state)?;
+pub async fn update_settings(_state: State<'_, AppState>, update: SettingsUpdate) -> Result<AppSettings, AppError> {
+    let mut settings = load_settings_from_store()?;
     settings.merge_update(update);
     settings.sanitize();
-    save_settings_to_store(&state, &settings)?;
+    save_settings_to_store(&settings)?;
     Ok(settings)
 }
 
 #[command]
-pub async fn export_settings(state: State<'_, AppState>) -> Result<String, AppError> {
-    let settings = load_settings_from_store(&state)?;
+pub async fn export_settings(_state: State<'_, AppState>) -> Result<String, AppError> {
+    let settings = load_settings_from_store()?;
     let json = serde_json::to_string_pretty(&settings)
         .map_err(|e| AppError::Custom(format!("Failed to export settings: {}", e)))?;
     Ok(json)
 }
 
 #[command]
-pub async fn export_settings_to_file(app: AppHandle, state: State<'_, AppState>) -> Result<bool, AppError> {
-    let settings = load_settings_from_store(&state)?;
+pub async fn export_settings_to_file(app: AppHandle, _state: State<'_, AppState>) -> Result<bool, AppError> {
+    let settings = load_settings_from_store()?;
     let json = serde_json::to_string_pretty(&settings)
         .map_err(|e| AppError::Custom(format!("Failed to export settings: {}", e)))?;
 
@@ -95,16 +96,16 @@ pub async fn export_settings_to_file(app: AppHandle, state: State<'_, AppState>)
 }
 
 #[command]
-pub async fn import_settings(state: State<'_, AppState>, json: String) -> Result<AppSettings, AppError> {
+pub async fn import_settings(_state: State<'_, AppState>, json: String) -> Result<AppSettings, AppError> {
     let mut settings: AppSettings = serde_json::from_str(&json)
         .map_err(|e| AppError::Custom(format!("Failed to parse import: {}", e)))?;
     settings.sanitize();
-    save_settings_to_store(&state, &settings)?;
+    save_settings_to_store(&settings)?;
     Ok(settings)
 }
 
 #[command]
-pub async fn import_settings_from_file(app: AppHandle, state: State<'_, AppState>) -> Result<Option<AppSettings>, AppError> {
+pub async fn import_settings_from_file(app: AppHandle, _state: State<'_, AppState>) -> Result<Option<AppSettings>, AppError> {
     let app_clone = app.clone();
     let file_path = tauri::async_runtime::spawn_blocking(move || {
         app_clone
@@ -125,7 +126,7 @@ pub async fn import_settings_from_file(app: AppHandle, state: State<'_, AppState
                 let mut settings: AppSettings = serde_json::from_str(&json)
                     .map_err(|e| AppError::Custom(format!("Failed to parse import: {}", e)))?;
                 settings.sanitize();
-                save_settings_to_store(&state, &settings)?;
+                save_settings_to_store(&settings)?;
                 Ok(Some(settings))
             } else {
                 Ok(None)
@@ -136,8 +137,8 @@ pub async fn import_settings_from_file(app: AppHandle, state: State<'_, AppState
 }
 
 #[command]
-pub async fn reset_settings(state: State<'_, AppState>) -> Result<AppSettings, AppError> {
+pub async fn reset_settings(_state: State<'_, AppState>) -> Result<AppSettings, AppError> {
     let settings = AppSettings::default();
-    save_settings_to_store(&state, &settings)?;
+    save_settings_to_store(&settings)?;
     Ok(settings)
 }
