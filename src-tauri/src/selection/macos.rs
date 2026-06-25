@@ -21,6 +21,7 @@ extern "C" {
         value: *mut CFTypeRef,
     ) -> i32;
     fn AXIsProcessTrusted() -> BOOL;
+    fn AXIsProcessTrustedWithOptions(options: CFTypeRef) -> BOOL;
 }
 
 pub struct MacOsSelectionDetector;
@@ -30,8 +31,19 @@ impl MacOsSelectionDetector {
         Self
     }
 
-    fn check_accessibility(&self) -> bool {
+    pub fn check_accessibility(&self) -> bool {
         unsafe { AXIsProcessTrusted() == YES }
+    }
+
+    pub fn request_accessibility() -> bool {
+        unsafe {
+            // This will trigger the system permission prompt
+            let key = CFString::new("AXTrustedCheckOptionPrompt");
+            let options = core_foundation::dictionary::CFDictionary::from_CFType_pairs(&[
+                (key.as_CFType(), core_foundation::boolean::CFBoolean::true_value().as_CFType()),
+            ]);
+            AXIsProcessTrustedWithOptions(options.as_concrete_TypeRef() as CFTypeRef) == YES
+        }
     }
 
     fn get_focused_app_pid(&self) -> Option<i32> {

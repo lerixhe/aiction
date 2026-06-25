@@ -17,28 +17,6 @@
         "height": 600,
         "center": true,
         "visible": true
-      },
-      {
-        "label": "toolbar",
-        "title": "AIction Toolbar",
-        "width": 400,
-        "height": 48,
-        "decorations": false,
-        "transparent": true,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
-        "visible": false
-      },
-      {
-        "label": "chat",
-        "title": "AIction Chat",
-        "width": 420,
-        "height": 600,
-        "decorations": false,
-        "transparent": true,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
-        "visible": false
       }
     ],
     "security": {

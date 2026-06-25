@@ -29,6 +29,11 @@ export const TAURI_COMMANDS = {
   HAS_PENDING_SELECTION: "has_pending_selection",
   GET_CURSOR_POSITION: "get_cursor_position",
   CALCULATE_TOOLBAR_POSITION: "calculate_toolbar_position",
+  START_SELECTION_MONITOR: "start_selection_monitor",
+  STOP_SELECTION_MONITOR: "stop_selection_monitor",
+  IS_SELECTION_MONITOR_RUNNING: "is_selection_monitor_running",
+  CHECK_ACCESSIBILITY_PERMISSION: "check_accessibility_permission",
+  REQUEST_ACCESSIBILITY_PERMISSION: "request_accessibility_permission",
   // ai commands
   STREAM_CHAT: "stream_chat",
   CHAT: "chat",
@@ -41,7 +46,8 @@ export const TAURI_COMMANDS = {
 // Tauri 事件名称常量
 export const TAURI_EVENTS = {
   STATE_CHANGED: "state:changed",
-  SELECTION_CHANGED: "selection:changed",
+  SELECTION_CHANGED: "selection-changed",
+  SELECTION_CLEARED: "selection-cleared",
   CHAT_STREAM_PREFIX: "chat-stream:",
 } as const;
 
@@ -49,6 +55,11 @@ export const TAURI_EVENTS = {
 export interface StateChangedPayload {
   key: string;
   value: unknown;
+}
+
+export interface SelectionEvent {
+  text: string;
+  toolbar_position?: ToolbarPosition;
 }
 
 export interface PositionPayload {

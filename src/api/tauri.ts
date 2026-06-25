@@ -154,3 +154,25 @@ export async function testProvider(request: TestProviderRequest): Promise<TestPr
 export async function getModels(request: GetModelsRequest): Promise<GetModelsResponse> {
   return await invoke<GetModelsResponse>(TAURI_COMMANDS.GET_MODELS, { request });
 }
+
+// 选区监听命令
+export async function startSelectionMonitor(): Promise<boolean> {
+  return await invoke<boolean>(TAURI_COMMANDS.START_SELECTION_MONITOR);
+}
+
+export async function stopSelectionMonitor(): Promise<boolean> {
+  return await invoke<boolean>(TAURI_COMMANDS.STOP_SELECTION_MONITOR);
+}
+
+export async function isSelectionMonitorRunning(): Promise<boolean> {
+  return await invoke<boolean>(TAURI_COMMANDS.IS_SELECTION_MONITOR_RUNNING);
+}
+
+// 辅助功能权限命令
+export async function checkAccessibilityPermission(): Promise<boolean> {
+  return await invoke<boolean>(TAURI_COMMANDS.CHECK_ACCESSIBILITY_PERMISSION);
+}
+
+export async function requestAccessibilityPermission(): Promise<boolean> {
+  return await invoke<boolean>(TAURI_COMMANDS.REQUEST_ACCESSIBILITY_PERMISSION);
+}

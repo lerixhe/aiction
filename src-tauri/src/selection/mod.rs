@@ -48,3 +48,37 @@ pub fn create_detector() -> Box<dyn SelectionDetector> {
         compile_error!("Unsupported platform for selection detection");
     }
 }
+
+pub fn check_accessibility_permission() -> bool {
+    #[cfg(target_os = "macos")]
+    {
+        macos::MacOsSelectionDetector::new().check_accessibility()
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        true // Windows doesn't need special accessibility permission
+    }
+
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    {
+        false
+    }
+}
+
+pub fn request_accessibility_permission() -> bool {
+    #[cfg(target_os = "macos")]
+    {
+        macos::MacOsSelectionDetector::request_accessibility()
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        true // Windows doesn't need special accessibility permission
+    }
+
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    {
+        false
+    }
+}

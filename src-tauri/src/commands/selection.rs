@@ -1,9 +1,11 @@
 use crate::error::AppError;
 use crate::selection::{self, SelectionResult, SelectionState};
 use crate::selection::position::{PositionCalculator, ToolbarPosition};
+use crate::selection_service::SelectionService;
 use crate::state::AppState;
 use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
+use std::sync::{Arc, Mutex};
 use tauri::command;
 use tauri::State;
 
@@ -92,4 +94,43 @@ pub async fn calculate_toolbar_position(
         .with_margin(10.0);
 
     Ok(calculator.calculate_position(&cursor, &screen))
+}
+
+#[command]
+pub async fn start_selection_monitor(
+    service: State<'_, Arc<Mutex<SelectionService>>>,
+    app: tauri::AppHandle,
+) -> Result<bool, AppError> {
+    let mut service = service.lock().map_err(|e| AppError::Lock(e.to_string()))?;
+    if !service.is_running() {
+        service.start(app);
+    }
+    Ok(true)
+}
+
+#[command]
+pub async fn stop_selection_monitor(
+    service: State<'_, Arc<Mutex<SelectionService>>>,
+) -> Result<bool, AppError> {
+    let mut service = service.lock().map_err(|e| AppError::Lock(e.to_string()))?;
+    service.stop();
+    Ok(true)
+}
+
+#[command]
+pub async fn is_selection_monitor_running(
+    service: State<'_, Arc<Mutex<SelectionService>>>,
+) -> Result<bool, AppError> {
+    let service = service.lock().map_err(|e| AppError::Lock(e.to_string()))?;
+    Ok(service.is_running())
+}
+
+#[command]
+pub async fn check_accessibility_permission() -> Result<bool, AppError> {
+    Ok(selection::check_accessibility_permission())
+}
+
+#[command]
+pub async fn request_accessibility_permission() -> Result<bool, AppError> {
+    Ok(selection::request_accessibility_permission())
 }

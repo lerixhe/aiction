@@ -3,6 +3,7 @@ mod commands;
 mod error;
 mod events;
 mod selection;
+mod selection_service;
 mod settings;
 mod settings_store;
 mod shortcuts;
@@ -14,8 +15,10 @@ mod windows;
 #[macro_use]
 extern crate objc;
 
+use std::sync::{Arc, Mutex};
 use tauri::Manager;
 use state::AppState;
+use selection_service::SelectionService;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -28,6 +31,7 @@ pub fn run() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .manage(AppState::default())
+        .manage(Arc::new(Mutex::new(SelectionService::new())))
         .setup(|app| {
             settings_store::init_settings_store(app.handle())?;
 
@@ -37,6 +41,16 @@ pub fn run() {
             state.update_settings(settings).unwrap_or_else(|e| {
                 log::error!("Failed to load settings into state: {}", e);
             });
+
+            // Start selection monitoring
+            let selection_service = app.state::<Arc<Mutex<SelectionService>>>();
+            {
+                let mut service = selection_service.lock().unwrap();
+                if service.is_running() {
+                    service.stop();
+                }
+                service.start(app.handle().clone());
+            }
 
             tray::create_tray(app)?;
             shortcuts::register_shortcuts(app)?;
@@ -72,6 +86,11 @@ pub fn run() {
             commands::has_pending_selection,
             commands::get_cursor_position,
             commands::calculate_toolbar_position,
+            commands::start_selection_monitor,
+            commands::stop_selection_monitor,
+            commands::is_selection_monitor_running,
+            commands::check_accessibility_permission,
+            commands::request_accessibility_permission,
             // ai commands
             commands::stream_chat,
             commands::chat,

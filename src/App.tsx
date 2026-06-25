@@ -2,8 +2,11 @@ import { Router } from "~/components/Router";
 import { SelectionToolbar } from "~/components/SelectionToolbar";
 import { ChatWindow } from "~/components/ChatWindow";
 import { SettingsPage } from "~/components/settings/SettingsPage";
-import { useState, useCallback } from "react";
-import { greet, getVersion } from "~/api/tauri";
+import { AccessibilityGuide } from "~/components/AccessibilityGuide";
+import { useState, useEffect, useCallback } from "react";
+import { listen } from "@tauri-apps/api/event";
+import { greet, getVersion, hideToolbarWindow, showChatWindow } from "~/api/tauri";
+import { TAURI_EVENTS, type SelectionEvent } from "~/shared/events";
 
 function MainContent() {
   const [greetMsg, setGreetMsg] = useState("");
@@ -25,7 +28,9 @@ function MainContent() {
           AIction Desktop
         </h1>
 
-        <div className="space-y-6">
+        <AccessibilityGuide />
+
+        <div className="space-y-6 mt-6">
           <div className="text-center">
             <p className="text-gray-600 dark:text-gray-400 mb-4">Tauri v2 + React + TypeScript</p>
             <div className="flex gap-3 justify-center">
@@ -82,7 +87,27 @@ function MainContent() {
 }
 
 function ToolbarView() {
-  const [selectedText] = useState("示例选中文本");
+  const [selectedText, setSelectedText] = useState<string | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const unlistenSelection = listen<SelectionEvent>(TAURI_EVENTS.SELECTION_CHANGED, (event) => {
+      console.log("Toolbar received selection:", event.payload);
+      setSelectedText(event.payload.text);
+      setIsVisible(true);
+    });
+
+    const unlistenCleared = listen(TAURI_EVENTS.SELECTION_CLEARED, () => {
+      console.log("Toolbar received clear");
+      setSelectedText(null);
+      setIsVisible(false);
+    });
+
+    return () => {
+      unlistenSelection.then((fn) => fn());
+      unlistenCleared.then((fn) => fn());
+    };
+  }, []);
 
   const handleActionClick = useCallback((actionId: string, text: string) => {
     console.log("Action:", actionId, text);
@@ -90,13 +115,25 @@ function ToolbarView() {
 
   const handleOpenChat = useCallback((text: string) => {
     console.log("Open chat with:", text);
+    showChatWindow().catch(console.error);
   }, []);
+
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    setSelectedText(null);
+    hideToolbarWindow().catch(console.error);
+  }, []);
+
+  if (!isVisible || !selectedText) {
+    return null;
+  }
 
   return (
     <SelectionToolbar
       selectedText={selectedText}
       onActionClick={handleActionClick}
       onOpenChat={handleOpenChat}
+      onClose={handleClose}
     />
   );
 }
