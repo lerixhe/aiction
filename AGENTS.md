@@ -290,6 +290,23 @@ pnpm bundle-icons
 
 ---
 
+## 参考文档
+
+项目 `reference/` 目录包含竞品分析和开发路线图，开发前建议查阅：
+
+### 目录结构
+```
+reference/
+├── competitive-analysis.html      # 竞品分析文档
+└── development-roadmap.html       # 开发路线图（7层28任务）
+```
+
+### 核心参考文档
+- **竞品分析**：`reference/competitive-analysis.html` - 对比竞品的技术架构和功能特性
+- **开发路线图**：`reference/development-roadmap.html` - 分层开发计划（L0-L7），包含任务详情和验收标准
+
+**开发具体功能前**，先查看路线图对应层级和参考项目实现。
+
 ## 技能参考
 
 已安装的开发技能：
