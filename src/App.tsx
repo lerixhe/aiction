@@ -92,13 +92,11 @@ function ToolbarView() {
 
   useEffect(() => {
     const unlistenSelection = listen<SelectionEvent>(TAURI_EVENTS.SELECTION_CHANGED, (event) => {
-      console.log("Toolbar received selection:", event.payload);
       setSelectedText(event.payload.text);
       setIsVisible(true);
     });
 
     const unlistenCleared = listen(TAURI_EVENTS.SELECTION_CLEARED, () => {
-      console.log("Toolbar received clear");
       setSelectedText(null);
       setIsVisible(false);
     });
@@ -109,12 +107,11 @@ function ToolbarView() {
     };
   }, []);
 
-  const handleActionClick = useCallback((actionId: string, text: string) => {
-    console.log("Action:", actionId, text);
+  const handleActionClick = useCallback((_actionId: string, _text: string) => {
+    // TODO: Implement action execution
   }, []);
 
-  const handleOpenChat = useCallback((text: string) => {
-    console.log("Open chat with:", text);
+  const handleOpenChat = useCallback((_text: string) => {
     showChatWindow().catch(console.error);
   }, []);
 

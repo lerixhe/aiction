@@ -22,9 +22,12 @@ use selection_service::SelectionService;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    env_logger::init();
-
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_log::Builder::new()
+                .level(log::LevelFilter::Info)
+                .build(),
+        )
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
@@ -45,7 +48,7 @@ pub fn run() {
             // Start selection monitoring
             let selection_service = app.state::<Arc<Mutex<SelectionService>>>();
             {
-                let mut service = selection_service.lock().unwrap();
+                let mut service = selection_service.lock().expect("Failed to lock SelectionService");
                 if service.is_running() {
                     service.stop();
                 }

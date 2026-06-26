@@ -32,13 +32,13 @@ impl AiProvider {
         let mut headers = reqwest::header::HeaderMap::new();
         headers.insert(
             reqwest::header::CONTENT_TYPE,
-            "application/json".parse().unwrap(),
+            "application/json".parse().expect("Invalid content-type header"),
         );
 
         if let Some(key) = &self.api_key {
             headers.insert(
                 reqwest::header::AUTHORIZATION,
-                format!("Bearer {}", key).parse().unwrap(),
+                format!("Bearer {}", key).parse().expect("Invalid authorization header"),
             );
         }
 

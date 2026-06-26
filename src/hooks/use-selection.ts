@@ -15,7 +15,6 @@ export function useSelection() {
 
   useEffect(() => {
     const unlistenSelection = listen<SelectionEvent>(TAURI_EVENTS.SELECTION_CHANGED, (event) => {
-      console.log("Selection changed:", event.payload);
       setSelectedText(event.payload.text);
       if (event.payload.toolbar_position) {
         setToolbarPosition(event.payload.toolbar_position);
@@ -24,7 +23,6 @@ export function useSelection() {
     });
 
     const unlistenCleared = listen(TAURI_EVENTS.SELECTION_CLEARED, () => {
-      console.log("Selection cleared");
       setSelectedText(null);
       setToolbarPosition(null);
       setIsVisible(false);
@@ -49,15 +47,14 @@ export function useSelection() {
   }, [isVisible, toolbarPosition]);
 
   const handleActionClick = useCallback(
-    (actionId: string, text: string) => {
-      console.log("Action clicked:", actionId, text);
+    (_actionId: string, _text: string) => {
+      // TODO: Implement action execution
     },
     []
   );
 
   const handleOpenChat = useCallback(
-    (text: string) => {
-      console.log("Open chat with:", text);
+    (_text: string) => {
       showChatWindow().catch(console.error);
     },
     []

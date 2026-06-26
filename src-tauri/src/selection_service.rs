@@ -57,7 +57,7 @@ impl SelectionService {
 
                         // Check if this is the same as last selection
                         let should_emit = {
-                            let mut last = last_text.lock().unwrap();
+                            let mut last = last_text.lock().expect("SelectionService: failed to lock last_text");
                             if last.as_ref() == Some(&text) {
                                 false
                             } else {
@@ -111,7 +111,7 @@ impl SelectionService {
                     }
                     SelectionState::Empty => {
                         let had_text = {
-                            let mut last = last_text.lock().unwrap();
+                            let mut last = last_text.lock().expect("SelectionService: failed to lock last_text");
                             last.take().is_some()
                         };
 
@@ -148,7 +148,7 @@ impl SelectionService {
             let _ = handle.join();
         }
         // Clear last text
-        let mut last = self.last_text.lock().unwrap();
+        let mut last = self.last_text.lock().expect("SelectionService: failed to lock last_text");
         *last = None;
     }
 
