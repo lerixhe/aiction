@@ -1,11 +1,9 @@
 use crate::error::AppError;
 use crate::selection::{self, SelectionResult, SelectionState};
 use crate::selection::position::{PositionCalculator, ToolbarPosition};
-use crate::selection_service::SelectionService;
 use crate::state::AppState;
 use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
-use std::sync::{Arc, Mutex};
 use tauri::command;
 use tauri::State;
 
@@ -15,48 +13,70 @@ pub struct SelectionResponse {
     pub toolbar_position: Option<ToolbarPosition>,
 }
 
+/// 按需捕获当前选区文本（类似 Kivio 的 capture_active_selection）
+/// 优先使用 Accessibility API，失败时 fallback 到 Cmd+C
 #[command]
-pub async fn get_selected_text(state: State<'_, AppState>) -> Result<SelectionResponse, AppError> {
-    debug!("Getting selected text");
+pub async fn capture_selection(state: State<'_, AppState>) -> Result<SelectionResponse, AppError> {
+    info!("Capturing active selection");
 
-    let detector = selection::create_detector();
-    let selection_state = detector.get_selected_text();
+    match selection::capture_active_selection() {
+        Some(text) => {
+            info!("Selection captured: {} chars", text.len());
 
-    match &selection_state {
-        SelectionState::Text(result) => {
-            info!("Selected text found: {} chars", result.text.len());
+            // 获取鼠标位置作为工具栏定位参考
+            let cursor_pos = get_mouse_position();
+            let result = SelectionResult {
+                text,
+                position: cursor_pos,
+            };
 
             // Store in pending selection
             state.set_pending_selection(Some(result.clone()))?;
 
-            // Calculate toolbar position if we have cursor position
+            // Calculate toolbar position
             let toolbar_position = if let Some(ref cursor) = result.position {
                 let screen = selection::position::get_screen_bounds();
                 let calculator = PositionCalculator::new(400.0, 48.0)
                     .with_offset(20.0)
                     .with_margin(10.0);
-
                 Some(calculator.calculate_position(cursor, &screen))
             } else {
                 None
             };
 
             Ok(SelectionResponse {
-                state: selection_state,
+                state: SelectionState::Text(result),
                 toolbar_position,
             })
         }
-        SelectionState::Empty => {
-            debug!("No text selected");
+        None => {
+            debug!("No selection captured");
             Ok(SelectionResponse {
-                state: selection_state,
+                state: SelectionState::Empty,
                 toolbar_position: None,
             })
         }
-        SelectionState::Unavailable => {
-            error!("Selection detection unavailable");
-            Err(AppError::Selection("Selection detection unavailable".to_string()))
-        }
+    }
+}
+
+/// 获取当前鼠标位置
+fn get_mouse_position() -> Option<crate::selection::CursorPosition> {
+    #[cfg(target_os = "macos")]
+    {
+        use core_graphics::event::CGEvent;
+        use core_graphics::event_source::{CGEventSource, CGEventSourceStateID};
+
+        let source = CGEventSource::new(CGEventSourceStateID::HIDSystemState).ok()?;
+        let event = CGEvent::new(source).ok()?;
+        let point = event.location();
+        Some(crate::selection::CursorPosition {
+            x: point.x,
+            y: point.y,
+        })
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        None
     }
 }
 
@@ -73,8 +93,7 @@ pub async fn has_pending_selection(state: State<'_, AppState>) -> Result<bool, A
 
 #[command]
 pub async fn get_cursor_position() -> Result<Option<crate::selection::CursorPosition>, AppError> {
-    let detector = selection::create_detector();
-    Ok(detector.get_cursor_position())
+    Ok(get_mouse_position())
 }
 
 #[command]
@@ -94,35 +113,6 @@ pub async fn calculate_toolbar_position(
         .with_margin(10.0);
 
     Ok(calculator.calculate_position(&cursor, &screen))
-}
-
-#[command]
-pub async fn start_selection_monitor(
-    service: State<'_, Arc<Mutex<SelectionService>>>,
-    app: tauri::AppHandle,
-) -> Result<bool, AppError> {
-    let mut service = service.lock().map_err(|e| AppError::Lock(e.to_string()))?;
-    if !service.is_running() {
-        service.start(app);
-    }
-    Ok(true)
-}
-
-#[command]
-pub async fn stop_selection_monitor(
-    service: State<'_, Arc<Mutex<SelectionService>>>,
-) -> Result<bool, AppError> {
-    let mut service = service.lock().map_err(|e| AppError::Lock(e.to_string()))?;
-    service.stop();
-    Ok(true)
-}
-
-#[command]
-pub async fn is_selection_monitor_running(
-    service: State<'_, Arc<Mutex<SelectionService>>>,
-) -> Result<bool, AppError> {
-    let service = service.lock().map_err(|e| AppError::Lock(e.to_string()))?;
-    Ok(service.is_running())
 }
 
 #[command]

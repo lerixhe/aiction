@@ -23,15 +23,12 @@ export const TAURI_COMMANDS = {
   HIDE_CHAT_WINDOW: "hide_chat_window",
   POSITION_TOOLBAR: "position_toolbar",
   RESIZE_TOOLBAR: "resize_toolbar",
-  // selection commands
-  GET_SELECTED_TEXT: "get_selected_text",
+  // selection commands (按需捕获，类似 Kivio 方案)
+  CAPTURE_SELECTION: "capture_selection",
   TAKE_PENDING_SELECTION: "take_pending_selection",
   HAS_PENDING_SELECTION: "has_pending_selection",
   GET_CURSOR_POSITION: "get_cursor_position",
   CALCULATE_TOOLBAR_POSITION: "calculate_toolbar_position",
-  START_SELECTION_MONITOR: "start_selection_monitor",
-  STOP_SELECTION_MONITOR: "stop_selection_monitor",
-  IS_SELECTION_MONITOR_RUNNING: "is_selection_monitor_running",
   CHECK_ACCESSIBILITY_PERMISSION: "check_accessibility_permission",
   REQUEST_ACCESSIBILITY_PERMISSION: "request_accessibility_permission",
   // ai commands

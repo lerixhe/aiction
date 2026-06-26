@@ -35,6 +35,7 @@ objc = "0.2"
 cocoa = "0.26"
 core-foundation = "0.10"
 core-graphics = "0.24"
+libc = "0.2"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows = { version = "0.58", features = [

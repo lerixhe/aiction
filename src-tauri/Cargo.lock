@@ -37,6 +37,7 @@ dependencies = [
  "core-foundation 0.10.1",
  "core-graphics 0.24.0",
  "futures",
+ "libc",
  "log",
  "objc",
  "reqwest 0.12.28",
