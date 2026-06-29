@@ -17,7 +17,7 @@ import {
   type TestProviderResponse,
   type ToolbarPosition,
 } from "~/shared/events";
-import type { AppSettings, SettingsUpdate } from "~/shared/types";
+import type { AppSettings, Conversation, ConversationSummary, SettingsUpdate } from "~/shared/types";
 
 // 基础命令
 export async function greet(name: string): Promise<string> {
@@ -162,4 +162,29 @@ export async function checkAccessibilityPermission(): Promise<boolean> {
 
 export async function requestAccessibilityPermission(): Promise<boolean> {
   return await invoke<boolean>(TAURI_COMMANDS.REQUEST_ACCESSIBILITY_PERMISSION);
+}
+
+// 对话命令
+export async function getConversations(): Promise<ConversationSummary[]> {
+  return await invoke<ConversationSummary[]>(TAURI_COMMANDS.GET_CONVERSATIONS);
+}
+
+export async function getConversation(id: string): Promise<Conversation | null> {
+  return await invoke<Conversation | null>(TAURI_COMMANDS.GET_CONVERSATION, { id });
+}
+
+export async function createConversation(source: string, selectedText?: string): Promise<Conversation> {
+  return await invoke<Conversation>(TAURI_COMMANDS.CREATE_CONVERSATION, { source, selectedText });
+}
+
+export async function addConversationMessage(id: string, role: string, content: string): Promise<Conversation> {
+  return await invoke<Conversation>(TAURI_COMMANDS.ADD_CONVERSATION_MESSAGE, { id, role, content });
+}
+
+export async function updateConversationTitle(id: string, title: string): Promise<void> {
+  await invoke(TAURI_COMMANDS.UPDATE_CONVERSATION_TITLE, { id, title });
+}
+
+export async function deleteConversation(id: string): Promise<void> {
+  await invoke(TAURI_COMMANDS.DELETE_CONVERSATION, { id });
 }

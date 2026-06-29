@@ -1,3 +1,24 @@
+import type { ChatMessage } from './events'
+
+export interface Conversation {
+  id: string
+  title: string
+  messages: ChatMessage[]
+  createdAt: number
+  updatedAt: number
+  source: 'manual' | 'selection'
+  selectedText?: string
+}
+
+export interface ConversationSummary {
+  id: string
+  title: string
+  createdAt: number
+  updatedAt: number
+  source: 'manual' | 'selection'
+  messageCount: number
+}
+
 export interface ProviderConfig {
   id: string
   name: string

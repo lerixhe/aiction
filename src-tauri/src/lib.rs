@@ -1,5 +1,6 @@
 mod ai;
 mod commands;
+mod conversations;
 mod error;
 mod events;
 mod selection;
@@ -33,6 +34,7 @@ pub fn run() {
         .manage(AppState::default())
         .setup(|app| {
             settings_store::init_settings_store(app.handle())?;
+            conversations::init_conversation_store(app.handle())?;
 
             // Load settings into AppState
             let settings = settings_store::load_settings().unwrap_or_default();
@@ -84,6 +86,13 @@ pub fn run() {
             commands::execute_action,
             commands::test_provider,
             commands::get_models,
+            // conversation commands
+            commands::get_conversations,
+            commands::get_conversation,
+            commands::create_conversation,
+            commands::add_conversation_message,
+            commands::update_conversation_title,
+            commands::delete_conversation,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

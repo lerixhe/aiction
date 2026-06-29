@@ -38,6 +38,13 @@ export const TAURI_COMMANDS = {
   EXECUTE_ACTION: "execute_action",
   TEST_PROVIDER: "test_provider",
   GET_MODELS: "get_models",
+  // conversation commands
+  GET_CONVERSATIONS: "get_conversations",
+  GET_CONVERSATION: "get_conversation",
+  CREATE_CONVERSATION: "create_conversation",
+  ADD_CONVERSATION_MESSAGE: "add_conversation_message",
+  UPDATE_CONVERSATION_TITLE: "update_conversation_title",
+  DELETE_CONVERSATION: "delete_conversation",
 } as const;
 
 // Tauri 事件名称常量
